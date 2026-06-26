@@ -17,13 +17,15 @@ class RoleAndPermissionSeeder extends Seeder
         // รีเซ็ตแคชของ Role/Permission ก่อน
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
         // 1. สร้าง Permissions
-        Permission::create(['name' => 'edit articles']);
-        Permission::create(['name' => 'delete articles']);
-        Permission::create(['name' => 'publish articles']);
+        $editArticles = Permission::create(['name' => 'edit articles', 'guard_name' => 'web']);
+        $deleteArticles = Permission::create(['name' => 'delete articles', 'guard_name' => 'web']);
+        $publishArticles = Permission::create(['name' => 'publish articles', 'guard_name' => 'web']);
+
         // 2. สร้าง Roles และใส่สิทธิ์ (Permissions)
-        $role = Role::create(['name' => 'writer']);
-        $role->givePermissionTo('edit articles');
-        $role = Role::create(['name' => 'admin']);
-        $role->givePermissionTo(Permission::all()); // แอดมินได้ทุกสิทธิ์
+        $writerRole = Role::create(['name' => 'writer', 'guard_name' => 'web']);
+        $writerRole->givePermissionTo($editArticles);
+
+        $adminRole = Role::create(['name' => 'admin', 'guard_name' => 'web']);
+        $adminRole->givePermissionTo([$editArticles, $deleteArticles, $publishArticles]);
     }
 }
